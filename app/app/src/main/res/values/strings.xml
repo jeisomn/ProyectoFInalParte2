@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Aplicacion</string>
+    <string name="send_frames_button_text">Enviar Frames</string>
+</resources>
