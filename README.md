@@ -1,5 +1,7 @@
 # Report on the Classification of Traffic Signs Using SIFT and LBP
 
+![image](https://github.com/user-attachments/assets/65397807-5c70-4fd3-b64d-c44e4cc01966)
+
 ## Salesian Polytechnic University  
 ### Computer Vision  
 
