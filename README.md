@@ -47,7 +47,8 @@ The system is divided into modules that integrate to achieve the final objective
 
 ### 3.2 Schematic Diagram of the Solution
 
-![Solution Diagram](path/to/your/image.png)  
+![image](https://github.com/user-attachments/assets/4a58c579-e04e-440a-a8a0-dc6ef3790bef)
+
 
 ### 3.3 Details of the Techniques Used
 
