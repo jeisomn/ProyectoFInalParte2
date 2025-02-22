@@ -4,7 +4,6 @@ import numpy as np
 import os
 from io import BytesIO
 from PIL import Image
-import tempfile
 
 app = Flask(__name__)
 
@@ -63,7 +62,7 @@ def procesar_imagen(imagen_bytes):
     img_matches = image.copy()
 
     # Umbral para las coincidencias
-    ratio = 0.5
+    ratio = 0.8
 
     # Buscar coincidencias con las imágenes de logo1
     if des_frame is not None and len(des_logo1) > 0:
@@ -74,6 +73,29 @@ def procesar_imagen(imagen_bytes):
             if len(matches1_filtered) > 15:
                 img_matches = cv2.drawMatches(logo1_imagenes[i], kp_logo1[i], image, kp_frame, matches1_filtered, None)
 
+                # Convertir la imagen a HSV
+                hsv_image = cv2.cvtColor(img_matches, cv2.COLOR_BGR2HSV)
+
+                # Definir el rango de color amarillo en HSV
+                lower_yellow = np.array([20, 100, 100])  # Rango inferior para el color amarillo
+                upper_yellow = np.array([30, 255, 255])  # Rango superior para el color amarillo
+
+                # Crear una máscara para el color amarillo
+                yellow_mask = cv2.inRange(hsv_image, lower_yellow, upper_yellow)
+
+                # Encontrar los contornos de las áreas amarillas
+                contours, _ = cv2.findContours(yellow_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+                # Encontrar el contorno más grande
+                if contours:
+                    largest_contour = max(contours, key=cv2.contourArea)
+
+                    # Filtrar contornos demasiado pequeños
+                    if cv2.contourArea(largest_contour) > 500:
+                        x, y, w, h = cv2.boundingRect(largest_contour)
+                        # Dibujar un rectángulo alrededor del contorno más grande
+                        cv2.rectangle(img_matches, (x, y), (x + w, y + h), (0, 255, 255), 2)
+
     # Buscar coincidencias con las imágenes de logo2
     if des_frame is not None and len(des_logo2) > 0:
         for i, des_logo in enumerate(des_logo2):
@@ -82,6 +104,25 @@ def procesar_imagen(imagen_bytes):
             matches2_filtered = filtrar_coincidencias(matches2_pairs, ratio)
             if len(matches2_filtered) > 15:
                 img_matches = cv2.drawMatches(logo2_imagenes[i], kp_logo2[i], image, kp_frame, matches2_filtered, None)
+
+                # Convertir la imagen a HSV
+                hsv_image = cv2.cvtColor(img_matches, cv2.COLOR_BGR2HSV)
+
+                # Definir el rango de color amarillo en HSV
+                yellow_mask = cv2.inRange(hsv_image, lower_yellow, upper_yellow)
+
+                # Encontrar los contornos de las áreas amarillas
+                contours, _ = cv2.findContours(yellow_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+                # Encontrar el contorno más grande
+                if contours:
+                    largest_contour = max(contours, key=cv2.contourArea)
+
+                    # Filtrar contornos demasiado pequeños
+                    if cv2.contourArea(largest_contour) > 500:
+                        x, y, w, h = cv2.boundingRect(largest_contour)
+                        # Dibujar un rectángulo alrededor del contorno más grande
+                        cv2.rectangle(img_matches, (x, y), (x + w, y + h), (0, 255, 255), 2)
 
     # Convertir la imagen procesada a formato JPEG
     _, jpeg = cv2.imencode('.jpg', img_matches)
